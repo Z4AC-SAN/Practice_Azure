@@ -9,7 +9,7 @@ JIRA_TOKEN = "tu-api-token-de-jira"
 
 def auditar_infraestructura_azure():
     try:
-        # Comando básico de Azure CLI para listar reglas de red o verificar estado
+        #Modificar "TuGrupoDeRecursos" y "TuNSG" por los valores reales de tu infraestructura de Azure
         resultado = subprocess.run(
             ["az", "network", "nsg", "rule", "list", "-g", "TuGrupoDeRecursos", "--nsg-name", "TuNSG", "--output", "json"],
             capture_output=True,
@@ -25,7 +25,6 @@ def crear_ticket_jira(detalle_incidencia):
     auth = (JIRA_USER, JIRA_TOKEN)
     headers = {"Content-Type": "application/json"}
     
-    # Estructura del payload requerida por la API Cloud v3 de Jira
     payload = {
         "fields": {
             "project": {
