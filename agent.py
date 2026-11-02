@@ -2,16 +2,26 @@ import subprocess
 import requests
 import json
 
-# Configuración de tu cuenta de Jira
-JIRA_URL = "https://tu-dominio.atlassian.net/rest/api/3/issue"
-JIRA_USER = "tu-correo@tu-dominio.com"
-JIRA_TOKEN = "tu-api-token-de-jira"
+# ==============================================================================
+# CONFIGURACIÓN INICIAL: Modifica únicamente estos valores con tus datos
+# ==============================================================================
+JIRA_DOMINIO = "tu-dominio"                  # Ej: alumno-team-xxxxx (sin .atlassian.net)
+JIRA_USER = "tu-correo@dominio.com"          # Tu correo de registro en Atlassian
+JIRA_TOKEN = "tu-token-de-api-aqui"          # Tu Token de Acceso Personal (PAT) de Jira
+JIRA_PROJECT_KEY = "IT"                      # Clave corta de tu proyecto (ej. IT, PROJ)
+
+AZURE_RESOURCE_GROUP = "TuGrupoDeRecursos"     # Nombre de tu Grupo de Recursos en Azure
+AZURE_NSG_NAME = "TuNSG"                     # Nombre de tu Network Security Group
+# ==============================================================================
+
+# Construcción automática de la URL de la API de Jira
+JIRA_URL = f"https://{JIRA_DOMINIO}.atlassian.net/rest/api/3/issue"
 
 def auditar_infraestructura_azure():
     try:
-        #Modificar "TuGrupoDeRecursos" y "TuNSG" por los valores reales de tu infraestructura de Azure
+        # Comando de Azure CLI utilizando las variables configuradas arriba
         resultado = subprocess.run(
-            ["az", "network", "nsg", "rule", "list", "-g", "TuGrupoDeRecursos", "--nsg-name", "TuNSG", "--output", "json"],
+            ["az", "network", "nsg", "rule", "list", "-g", AZURE_RESOURCE_GROUP, "--nsg-name", AZURE_NSG_NAME, "--output", "json"],
             capture_output=True,
             text=True,
             check=True
@@ -25,10 +35,11 @@ def crear_ticket_jira(detalle_incidencia):
     auth = (JIRA_USER, JIRA_TOKEN)
     headers = {"Content-Type": "application/json"}
     
+    # Payload estructurado para la API Cloud v3 de Jira
     payload = {
         "fields": {
             "project": {
-                "key": "IT"  # Cambia por la clave corta de tu proyecto en Jira (ej. ITSM, PROJ)
+                "key": JIRA_PROJECT_KEY
             },
             "summary": "INC-NET-01: Revisión automática requerida en infraestructura de red",
             "description": {
@@ -47,7 +58,7 @@ def crear_ticket_jira(detalle_incidencia):
                 ]
             },
             "issuetype": {
-                "name": "Task"  # Puede ser "Task", "Bug" o "Incident" según tu configuración de Jira
+                "name": "Task"
             }
         }
     }
